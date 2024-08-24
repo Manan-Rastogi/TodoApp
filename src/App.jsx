@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 function App() {
   const [todo, setTodo] = useState("");
   const [updateIndex, setUpdateIndex] = useState(-1);
+  const [showFinished, setshowFinished] = useState(true);
 
   // Initialize todos with data from local storage
   const [todos, setTodos] = useState(() => {
@@ -32,6 +33,10 @@ function App() {
   useEffect(() => {
     saveToLS(todos);
   }, [todos]);
+
+  const toogleFinished = () => {
+    setshowFinished(!showFinished);
+  };
 
   // Function to handle adding or updating todos
   const handleAdd = (e) => {
@@ -78,20 +83,21 @@ function App() {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto bg-violet-100 rounded-xl py-5 px-10 my-5 min-h-[80vh] flex flex-col items-center gap-20">
-        <div className="addTodo flex flex-col gap-5 items-center">
+      <div className="md:container mx-auto bg-violet-100 rounded-xl py-5 md:px-10 md:my-5 md:min-h-[80vh] flex flex-col items-center gap-20 text-[10px] md:text-base">
+        <div className="addTodo flex flex-col gap-5 items-center w-full">
           <h2 className="font-bold text-2xl">Add a TODO</h2>
-          <div className="createTodo flex gap-10 justify-center">
+          <div className="createTodo flex gap-10 justify-center w-full">
             <input
               type="text"
-              className="w-[40vw] rounded-md bg-purple-200"
+              className="w-[60vw] md:w-[40vw] rounded-md bg-purple-200 pl-2"
               onChange={handleChange}
               value={todo}
             />
             <button
               type="submit"
-              className="rounded-md bg-purple-700 hover:bg-purple-900 text-white font-bold py-2 px-3"
+              className="rounded-md disabled:bg-purple-400 bg-purple-700 hover:bg-purple-900 text-white font-bold py-1 px-1 md:px-2"
               onClick={handleAdd}
+              disabled={todo.length <= 3}
             >
               {add}
             </button>
@@ -99,50 +105,62 @@ function App() {
         </div>
 
         <div className="todos flex flex-col gap-2 items-center w-3/4">
+          <div>
+            <input
+              type="checkbox"
+              className="finished"
+              onChange={toogleFinished}
+              checked={showFinished}
+            />{" "}
+            Show Finished
+          </div>
           <h2 className="font-bold text-2xl">Your TODOs</h2>
           {todos.length === 0 && (
             <div className="font-bold">No todos to display</div>
           )}
           {/* Rendering todo list */}
-          {todos.map((item) => (
-            <div
-              key={item.id}
-              className="todo flex justify-between items-center w-[40vw] bg-purple-200 p-2 rounded-md gap-5"
-            >
-              <div className="mainContent flex gap-3">
-                <input
-                  name={item.id}
-                  checked={item.isCompleted}
-                  type="checkbox"
-                  className="isDone"
-                  onChange={handleCheckbox}
-                />
+          {todos.map(
+            (item) =>
+              (showFinished || !item.isCompleted) && (
                 <div
-                  className={
-                    item.isCompleted
-                      ? "todoText line-through"
-                      : "todoText font-semibold text-clip"
-                  }
+                  key={item.id}
+                  className="todo flex justify-between items-center w-full md:w-[40vw] bg-purple-200 p-2 rounded-md gap-2"
                 >
-                  {item.todo}
+                  <div className="mainContent flex items-center gap-2">
+                    <input
+                      name={item.id}
+                      checked={item.isCompleted}
+                      type="checkbox"
+                      className="isDone"
+                      onChange={handleCheckbox}
+                    />
+                    <div
+                      className={
+                        item.isCompleted
+                          ? "todoText line-through"
+                          : "todoText font-semibold text-clip"
+                      }
+                    >
+                      {item.todo}
+                    </div>
+                  </div>
+                  <div className="actions flex gap-2">
+                    <button
+                      className="edit rounded-md bg-purple-700 hover:bg-purple-900 text-white font-bold py-1 px-1 md:px-2 "
+                      onClick={(e) => handleEdit(e, item.id)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="delete rounded-md bg-purple-700 hover:bg-purple-900 text-white font-bold py-1 px-1 md:px-2"
+                      onClick={(e) => handleDelete(e, item.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div className="actions flex gap-5">
-                <button
-                  className="edit rounded-md bg-purple-700 hover:bg-purple-900 text-white font-bold py-1 px-2"
-                  onClick={(e) => handleEdit(e, item.id)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="delete rounded-md bg-purple-700 hover:bg-purple-900 text-white font-bold py-1 px-2"
-                  onClick={(e) => handleDelete(e, item.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+              )
+          )}
         </div>
       </div>
     </>
