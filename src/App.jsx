@@ -105,7 +105,7 @@ function App() {
         </div>
 
         <div className="todos flex flex-col gap-2 items-center w-3/4">
-          <div>
+          <div className="flex justify-center items-center gap-1 md:gap-3">
             <input
               type="checkbox"
               className="finished"
